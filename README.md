@@ -1,5 +1,7 @@
 # ArtAdobado
 
+<p align="center"><img src="assets/adobado/icon.png" width="104" alt="ArtAdobado"></p>
+
 **Arte vectorial local.** Derivado de VectorCraft, rebrandeado para Adobado Kit.
 
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-6cb6ff)](LICENSE-APACHE)
