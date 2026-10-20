@@ -1,51 +1,48 @@
-//! Community and project links: the Discord button (header, About, Home) and the link list.
-//! Icons are Lucide's (ISC); Discord's own logo is a trademark, so the button uses a chat icon
-//! on Discord's colour with the word "Discord".
+//! Support and project links: a clear issue-tracker action and the kit/repository links.
 
 use egui::{Color32, CornerRadius, Sense, Ui, vec2};
 
 use crate::theme::{self, Tokens};
 use crate::{VectorcraftApp, icons};
 
-/// Discord's brand colour (a colour, not a logo).
-const DISCORD: Color32 = Color32::from_rgb(0x58, 0x65, 0xF2);
-
-/// The Discord button's label, height and width.
-fn discord_layout(ui: &Ui, large: bool) -> (std::sync::Arc<egui::Galley>, f32, f32) {
+/// The kit link's label, height and width.
+fn kit_layout(ui: &Ui, large: bool) -> (std::sync::Arc<egui::Galley>, f32, f32) {
     let (h, font, label) =
-        if large { (36.0, theme::semibold(14.0), tl!("Join our Discord")) } else { (24.0, egui::FontId::proportional(12.0), "Discord") };
+        if large { (36.0, theme::semibold(14.0), "Get help and report an issue") } else { (24.0, egui::FontId::proportional(12.0), "Adobado Kit") };
     let galley = ui.painter().layout_no_wrap(label.to_string(), font, Color32::PLACEHOLDER);
     let w = galley.size().x + h * 0.55 + h * 0.9;
     (galley, h, w)
 }
 
-/// The Discord button's width (the app bar drops it when space runs out).
-pub fn discord_width(ui: &Ui, large: bool) -> f32 {
-    discord_layout(ui, large).2
+/// The Kit link's width (the app bar drops it when space runs out).
+pub fn kit_width(ui: &Ui, large: bool) -> f32 {
+    kit_layout(ui, large).2
 }
 
-/// The Discord button: compact and quiet for the app bar, large for About / Home.
-pub fn discord_button(app: &mut VectorcraftApp, ui: &mut Ui, large: bool) -> egui::Response {
-    let (galley, h, w) = discord_layout(ui, large);
+/// The Kit link: compact and quiet for the app bar, prominent for About / Home.
+pub fn kit_button(app: &mut VectorcraftApp, ui: &mut Ui, large: bool) -> egui::Response {
+    let (galley, h, w) = kit_layout(ui, large);
     let icon = h * 0.55;
     let (r, resp) = ui.allocate_exact_size(vec2(w, h), Sense::click());
     let at = egui::pos2(0.0, r.center().y - galley.size().y / 2.0);
     let ir = egui::Rect::from_center_size(r.left_center() + vec2(h * 0.35 + icon / 2.0, 0.0), vec2(icon, icon));
     if large {
-        let fill = if resp.hovered() { DISCORD.gamma_multiply(0.85) } else { DISCORD };
+        let t = Tokens::get(ui.ctx());
+        let fill = if resp.hovered() { t.accent.gamma_multiply(0.85) } else { t.accent };
         ui.painter().rect_filled(r, CornerRadius::same((h / 2.0) as u8), fill);
-        icons::paint(ui, "message-circle", ir, Color32::WHITE);
+        icons::paint(ui, "external-link", ir, Color32::WHITE);
         ui.painter().galley(egui::pos2(ir.right() + h * 0.2, at.y), galley, Color32::WHITE);
     } else {
-        // In the app bar it stays quiet: a soft button with Discord's colour on its icon alone.
+        // In the app bar it stays quiet: a soft button with the kit link icon.
         let t = Tokens::get(ui.ctx());
         ui.painter().rect_filled(r, CornerRadius::same(6), if resp.hovered() { t.hover } else { t.button });
-        icons::paint(ui, "message-circle", ir, DISCORD);
+        icons::paint(ui, "external-link", ir, t.accent);
         ui.painter().galley(egui::pos2(ir.right() + h * 0.2, at.y), galley, if resp.hovered() { t.text_strong } else { t.text });
     }
-    let resp = resp.on_hover_text(tl!("Join the Adobado Kit community on Discord (discord.gg/artcraft)"));
+    let target = if large { vectorcraft_engine::cmd::help::SUPPORT_URL } else { vectorcraft_engine::cmd::help::WEBSITE_URL };
+    let resp = resp.on_hover_text(target);
     if resp.clicked() {
-        app.open_link("help.discord");
+        app.open_link(if large { "help.discord" } else { "help.website" });
     }
     resp
 }
@@ -62,14 +59,14 @@ fn link(app: &mut VectorcraftApp, ui: &mut Ui, icon: &str, label: &str, cmd: &st
     });
 }
 
-/// The Discord button and the website / app page / GitHub links.
+/// The support button and the website / app page / GitHub links.
 pub fn links(app: &mut VectorcraftApp, ui: &mut Ui) {
-    discord_button(app, ui, true);
+    kit_button(app, ui, true);
     ui.add_space(8.0);
     let l = app.session.execute("help.links", &serde_json::json!({})).unwrap_or_default();
     let s = |k: &str| l[k].as_str().unwrap_or("").to_string();
     link(app, ui, "globe", tl!("Adobado Kit website"), "help.website", &s("website"));
-    link(app, ui, "external-link", tl!("ArtAdobado on getartcraft.com"), "help.appPage", &s("appPage"));
+    link(app, ui, "external-link", tl!("ArtAdobado project page"), "help.appPage", &s("appPage"));
     link(app, ui, "git-branch", tl!("Source code on GitHub"), "help.github", &s("github"));
 }
 
@@ -90,15 +87,15 @@ mod tests {
         assert_eq!(
             *opened.lock().unwrap(),
             [
-                "https://github.com/smouj/Adobado_Kit",
-                "https://github.com/smouj/Adobado_Kit",
+                "https://github.com/smouj/ArtAdobado/issues",
+                "https://smouj.github.io/Adobado_Kit/",
                 "https://github.com/smouj/ArtAdobado",
                 "https://github.com/smouj/ArtAdobado"
             ]
         );
         // The control channel / MCP path returns the URL without opening a browser.
         let v = app.run("help.discord", serde_json::json!({})).unwrap();
-        assert_eq!(v["url"], "https://github.com/smouj/Adobado_Kit");
+        assert_eq!(v["url"], "https://github.com/smouj/ArtAdobado/issues");
         assert_eq!(opened.lock().unwrap().len(), 4);
         let ctx = egui::Context::default();
         theme::install_fonts(&ctx);

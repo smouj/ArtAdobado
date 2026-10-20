@@ -1,12 +1,5 @@
-VectorCraft app icon (vectorcraft.svg, vectorcraft-small.svg and every file derived from them in this
-directory: vectorcraft-1024.png, vectorcraft-macos-512.png, vectorcraft.icns, vectorcraft.ico, hicolor/).
+Official Adobado product icon licence
 
-Original artwork made for this project by the project owner, drawn in ArtCraft and vectorised for
-VectorCraft (no third-party material). Licensed like the rest of VectorCraft, under either of
+The official Adobado icon artwork in this repository was created by @smouj, who owns the artwork and supplied it in Adobado_Icon_Pack_Final.zip. The copyright holder authorizes redistribution of the icon artwork under either the MIT License or the Apache License, Version 2.0, at the recipient’s option.
 
-  * Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
-  * MIT license (https://opensource.org/licenses/MIT)
-
-at your option.
-
-Regenerate the derived files with packaging/icons.sh.
+The complete licence texts are in LICENSE-MIT.txt and LICENSE-APACHE.txt. This icon artwork is independent of the upstream application logo and is not derived from Adobe products.

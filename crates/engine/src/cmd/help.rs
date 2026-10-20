@@ -1,33 +1,34 @@
-//! Help → community and project links (the Adobado Kit Discord, website, this app's page and its
+//! Help → support and project links (the Adobado Kit website, this app's repository and its
 //! GitHub repository). The commands return the URL; the frontend opens it.
 
 use serde_json::{Value, json};
 
 use super::*;
 
-/// The app's id on getartcraft.com and GitHub.
-pub const APP_ID: &str = "vectorcraft";
-pub const DISCORD_URL: &str = "https://github.com/smouj/Adobado_Kit";
-pub const WEBSITE_URL: &str = "https://github.com/smouj/Adobado_Kit";
+/// This app's public repository name.
+pub const APP_ID: &str = "ArtAdobado";
+/// Where users can get help or report a problem.
+pub const SUPPORT_URL: &str = "https://github.com/smouj/ArtAdobado/issues";
+pub const WEBSITE_URL: &str = "https://smouj.github.io/Adobado_Kit/";
 
-/// This app's page on the website.
+/// This app's project page.
 pub fn app_page_url() -> String {
-    format!("{WEBSITE_URL}/apps/{APP_ID}")
+    github_url()
 }
 
 /// This app's source repository.
 pub fn github_url() -> String {
-    format!("https://github.com/storytold/{APP_ID}")
+    format!("https://github.com/smouj/{APP_ID}")
 }
 
 pub fn specs() -> Vec<CommandSpec> {
     vec![
-        cmd!(query "help.discord", "Join Our Discord", ["Help"], None, "{} → {url} the Adobado Kit community Discord", always, |_, _| url(DISCORD_URL.into())),
+        cmd!(query "help.discord", "Get Help and Report an Issue", ["Help"], None, "{} → {url} the ArtAdobado issue tracker", always, |_, _| url(SUPPORT_URL.into())),
         cmd!(query "help.website", "Adobado Kit Website", ["Help"], None, "{} → {url}", always, |_, _| url(WEBSITE_URL.into())),
-        cmd!(query "help.appPage", "ArtAdobado on getartcraft.com", ["Help"], None, "{} → {url} this app's page", always, |_, _| url(app_page_url())),
-        cmd!(query "help.github", "ArtAdobado on GitHub", ["Help"], None, "{} → {url} source code, issues and releases", always, |_, _| url(github_url())),
-        cmd!(query "help.links", "Links", [], None, "{} → {discord, website, appPage, github}", always, |_, _| {
-            Ok(json!({ "discord": DISCORD_URL, "website": WEBSITE_URL, "appPage": app_page_url(), "github": github_url() }))
+        cmd!(query "help.appPage", "ArtAdobado Project Page", ["Help"], None, "{} → {url} this app's repository", always, |_, _| url(app_page_url())),
+        cmd!(query "help.github", "ArtAdobado on GitHub", ["Help"], None, "{} → {url} source code and project history", always, |_, _| url(github_url())),
+        cmd!(query "help.links", "Links", [], None, "{} → {support, website, appPage, github}", always, |_, _| {
+            Ok(json!({ "support": SUPPORT_URL, "website": WEBSITE_URL, "appPage": app_page_url(), "github": github_url() }))
         }),
     ]
 }
@@ -43,9 +44,9 @@ mod tests {
     #[test]
     fn links() {
         let mut s = Session::new();
-        assert_eq!(s.execute("help.discord", &json!({})).unwrap()["url"], "https://github.com/smouj/Adobado_Kit");
+        assert_eq!(s.execute("help.discord", &json!({})).unwrap()["url"], SUPPORT_URL);
         assert_eq!(s.execute("help.appPage", &json!({})).unwrap()["url"], "https://github.com/smouj/ArtAdobado");
         assert_eq!(s.execute("help.github", &json!({})).unwrap()["url"], "https://github.com/smouj/ArtAdobado");
-        assert_eq!(s.execute("help.links", &json!({})).unwrap()["website"], "https://github.com/smouj/Adobado_Kit");
+        assert_eq!(s.execute("help.links", &json!({})).unwrap()["website"], WEBSITE_URL);
     }
 }
